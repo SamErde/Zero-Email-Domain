@@ -8,27 +8,37 @@
     create SPF, DKIM, and DMARC messages indicating that all messages should be rejected for the domain.
 
 .NOTES
-  Version:    0.5
-  Author:     Sam Erde
-  Date:       2022-01-28
+  Version:  0.5
+  Author:   Sam Erde
+  Date:     2022-01-28
 
-  Needs:  
-    Logging
-    Error handling
-    Check for existence of SPF, DKIM, and DMARC records
-    Wrap in functions
-    Actually handle pagination in results
+  Needs:
+            Logging
+            Error handling
+            Check for existence of SPF, DKIM, and DMARC records
+            Wrap in functions
+            Actually handle pagination in results
     
   Opportunities:
-    Add other DNS providers
-    Make it a module?
+            Add other DNS providers
+            Make it a module?
 #>
 
 #================================================================================
 #region Declare variables
-# Inputs
+# Inputs ==============================
+
+# Capture the current path of the script, or use the working directory if run at the console.
+if ($PSScriptRoot) {
+    $ScriptPath = $PSScriptRoot
+}
+else {
+    $ScriptPath = $pwd
+}
+
+$CloudflareApiToken = Get-Content "$ScriptPath\APIToken.txt" | ConvertTo-SecureString -AsPlainText -Force
+
 $BaseUri = 'https://api.cloudflare.com/client/v4/zones'
-$CloudflareApiToken = Get-Content "FileName.token" | ConvertTo-SecureString -AsPlainText -Force
 
 $IrmParams = @{
     Uri = $BaseUri
@@ -37,8 +47,8 @@ $IrmParams = @{
 }
 Invoke-RestMethod @IrmParams -SessionVariable "ApiSession"
 
-# Outputs
-$LogFilePath = "FilePath"
+# Outputs ==============================
+$LogFilePath = "$ScriptPath\Email Security DNS Records.log"
 $NoMxDomains = [System.Collections.ArrayList]::new()
 $MxDomains = [System.Collections.ArrayList]::new()
 
