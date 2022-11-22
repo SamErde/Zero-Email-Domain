@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Create email security DNS records for domains that do not use email.
+    Create DNS records for email security in domains that do not use email.
 
 .DESCRIPTION
     This script will check your Cloudflare account (or the scope that your API token has access to)
