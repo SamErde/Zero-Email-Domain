@@ -1,6 +1,8 @@
 BeforeDiscovery {
     $repoRoot = Split-Path -Path $PSScriptRoot -Parent
-    Import-Module -Name (Join-Path -Path $repoRoot -ChildPath 'ZeroEmailDomain\ZeroEmailDomain.psd1') -Force
+    $moduleRoot = Join-Path -Path $repoRoot -ChildPath 'ZeroEmailDomain'
+    $moduleManifest = Join-Path -Path $moduleRoot -ChildPath 'ZeroEmailDomain.psd1'
+    Import-Module -Name $moduleManifest -Force
 }
 
 Describe 'ZeroEmailDomain records' {

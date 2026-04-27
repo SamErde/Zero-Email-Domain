@@ -73,7 +73,8 @@ param(
     [switch]$PassThru
 )
 
-$modulePath = Join-Path -Path $PSScriptRoot -ChildPath 'ZeroEmailDomain\ZeroEmailDomain.psd1'
+$moduleRoot = Join-Path -Path $PSScriptRoot -ChildPath 'ZeroEmailDomain'
+$modulePath = Join-Path -Path $moduleRoot -ChildPath 'ZeroEmailDomain.psd1'
 Import-Module -Name $modulePath -Force
 
 Protect-ZeroEmailDomain @PSBoundParameters
