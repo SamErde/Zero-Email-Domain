@@ -1,0 +1,26 @@
+{
+  "version": "0.2",
+  "words": [
+    "adkim",
+    "aspf",
+    "Cloudflare",
+    "codeql",
+    "DKIM",
+    "DMARC",
+    "domainkey",
+    "dmarc",
+    "Erde",
+    "GitGuardian",
+    "gitguardian",
+    "ggshield",
+    "GoDaddy",
+    "GRYPE",
+    "Namecheap",
+    "Pester",
+    "psscriptanalyzer",
+    "pwsh",
+    "Route53",
+    "SARIF",
+    "sarif"
+  ]
+}
