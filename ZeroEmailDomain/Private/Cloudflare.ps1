@@ -280,8 +280,9 @@ function ConvertTo-ZedCloudflareRecordName {
     '{0}.{1}' -f $RecordName, $ZoneName
 }
 
-function Find-ZedDnsTxtRecord {
+function Select-ZedDnsTxtRecord {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     param(
         [Parameter()]
         [object[]]$Record,
@@ -291,28 +292,47 @@ function Find-ZedDnsTxtRecord {
     )
 
     $records = @($Record)
+    $desiredName = $DesiredRecord.Name
     $desiredContent = $DesiredRecord.Content
     $desiredMatchPrefix = $DesiredRecord.MatchPrefix
 
-    $exactMatch = $records |
+    $exactMatches = @($records |
         Where-Object { $_.content -eq $desiredContent } |
-        Select-Object -First 1
+        Select-Object -First 2)
 
-    if ($exactMatch) {
+    if ($exactMatches.Count -gt 1) {
+        $message = @(
+            "Multiple exact TXT record matches were found for '$desiredName'."
+            'Refusing to continue because the zone is ambiguous and syncing only one record could leave duplicate TXT records in place.'
+        ) -join ' '
+
+        throw $message
+    }
+
+    $prefixMatches = @($records |
+        Where-Object { $_.content -like "$desiredMatchPrefix*" } |
+        Select-Object -First 2)
+
+    if ($prefixMatches.Count -gt 1) {
+        $message = @(
+            "Multiple prefix TXT record matches were found for '$desiredName' using prefix '$desiredMatchPrefix'."
+            'Refusing to continue because the zone is ambiguous and syncing only one record could leave duplicate TXT records in place.'
+        ) -join ' '
+
+        throw $message
+    }
+
+    if ($exactMatches.Count -eq 1) {
         return [PSCustomObject]@{
             MatchType = 'Exact'
-            Record    = $exactMatch
+            Record    = $exactMatches[0]
         }
     }
 
-    $prefixMatch = $records |
-        Where-Object { $_.content -like "$desiredMatchPrefix*" } |
-        Select-Object -First 1
-
-    if ($prefixMatch) {
+    if ($prefixMatches.Count -eq 1) {
         return [PSCustomObject]@{
             MatchType = 'Prefix'
-            Record    = $prefixMatch
+            Record    = $prefixMatches[0]
         }
     }
 
@@ -337,7 +357,7 @@ function Invoke-ZedCloudflareTxtRecordSync {
 
     $recordName = ConvertTo-ZedCloudflareRecordName -RecordName $Record.Name -ZoneName $Zone.Name
     $existingRecords = Get-ZedCloudflareDnsRecord -Context $Context -ZoneId $Zone.Id -RecordType TXT -RecordName $recordName
-    $match = Find-ZedDnsTxtRecord -Record $existingRecords -DesiredRecord $Record
+    $match = Select-ZedDnsTxtRecord -Record $existingRecords -DesiredRecord $Record
 
     if ($match.MatchType -eq 'Exact') {
         return [PSCustomObject]@{

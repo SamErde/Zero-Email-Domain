@@ -8,7 +8,7 @@ BeforeDiscovery {
 Describe 'ZeroEmailDomain records' {
     InModuleScope ZeroEmailDomain {
         It 'returns the deny-all SPF, DKIM, and DMARC TXT records' {
-            $records = @(Get-ZedDesiredEmailProtectionRecord -Ttl 600)
+            $records = @(Get-ZedDesiredEmailProtectionRecordSet -Ttl 600)
 
             $records | Should -HaveCount 3
             $records[0].Content | Should -BeExactly 'v=spf1 -all'
@@ -69,6 +69,24 @@ Describe 'Cloudflare API helpers' {
             }
 
             $queryString | Should -Be ''
+        }
+
+        It 'normalizes Cloudflare apex record names to the zone name' {
+            $recordName = ConvertTo-ZedCloudflareRecordName -RecordName '@' -ZoneName 'example.com'
+
+            $recordName | Should -BeExactly 'example.com'
+        }
+
+        It 'keeps already fully-qualified Cloudflare record names unchanged' {
+            $recordName = ConvertTo-ZedCloudflareRecordName -RecordName '_dmarc.example.com' -ZoneName 'example.com'
+
+            $recordName | Should -BeExactly '_dmarc.example.com'
+        }
+
+        It 'qualifies relative Cloudflare record names with the zone name' {
+            $recordName = ConvertTo-ZedCloudflareRecordName -RecordName '*._domainkey' -ZoneName 'example.com'
+
+            $recordName | Should -BeExactly '*._domainkey.example.com'
         }
 
         It 'returns every Cloudflare page' {
@@ -150,6 +168,120 @@ Describe 'Cloudflare API helpers' {
             $result = Invoke-ZedCloudflareTxtRecordSync -Context $script:Context -Zone $zone -Record $record
 
             $result.Action | Should -Be 'Unchanged'
+            Should -Invoke Invoke-ZedCloudflareRequest -Exactly 0
+        }
+
+        It 'throws when multiple exact TXT records match the desired content' {
+            $zone = [PSCustomObject]@{
+                Id   = 'zone-1'
+                Name = 'example.com'
+            }
+            $record = [PSCustomObject]@{
+                Name        = '@'
+                Content     = 'v=spf1 -all'
+                Ttl         = 3600
+                MatchPrefix = 'v=spf1'
+            }
+
+            Mock Get-ZedCloudflareDnsRecord {
+                @(
+                    [PSCustomObject]@{
+                        id      = 'txt-1'
+                        name    = 'example.com'
+                        type    = 'TXT'
+                        content = 'v=spf1 -all'
+                    }
+                    [PSCustomObject]@{
+                        id      = 'txt-2'
+                        name    = 'example.com'
+                        type    = 'TXT'
+                        content = 'v=spf1 -all'
+                    }
+                )
+            }
+            Mock Invoke-ZedCloudflareRequest {
+                throw 'No write request should be made.'
+            }
+
+            {
+                Invoke-ZedCloudflareTxtRecordSync -Context $script:Context -Zone $zone -Record $record
+            } | Should -Throw '*Multiple exact TXT record matches*'
+            Should -Invoke Invoke-ZedCloudflareRequest -Exactly 0
+        }
+
+        It 'throws when multiple prefix TXT records match the desired policy prefix' {
+            $zone = [PSCustomObject]@{
+                Id   = 'zone-1'
+                Name = 'example.com'
+            }
+            $record = [PSCustomObject]@{
+                Name        = '@'
+                Content     = 'v=spf1 -all'
+                Ttl         = 3600
+                MatchPrefix = 'v=spf1'
+            }
+
+            Mock Get-ZedCloudflareDnsRecord {
+                @(
+                    [PSCustomObject]@{
+                        id      = 'txt-1'
+                        name    = 'example.com'
+                        type    = 'TXT'
+                        content = 'v=spf1 include:_spf.example.com -all'
+                    }
+                    [PSCustomObject]@{
+                        id      = 'txt-2'
+                        name    = 'example.com'
+                        type    = 'TXT'
+                        content = 'v=spf1 include:mail.example.com -all'
+                    }
+                )
+            }
+            Mock Invoke-ZedCloudflareRequest {
+                throw 'No write request should be made.'
+            }
+
+            {
+                Invoke-ZedCloudflareTxtRecordSync -Context $script:Context -Zone $zone -Record $record
+            } | Should -Throw '*Multiple prefix TXT record matches*'
+            Should -Invoke Invoke-ZedCloudflareRequest -Exactly 0
+        }
+
+        It 'throws when an exact TXT record and another prefix TXT record both exist' {
+            $zone = [PSCustomObject]@{
+                Id   = 'zone-1'
+                Name = 'example.com'
+            }
+            $record = [PSCustomObject]@{
+                Name        = '@'
+                Content     = 'v=spf1 -all'
+                Ttl         = 3600
+                MatchPrefix = 'v=spf1'
+            }
+
+            Mock Get-ZedCloudflareDnsRecord {
+                @(
+                    [PSCustomObject]@{
+                        id      = 'txt-1'
+                        name    = 'example.com'
+                        type    = 'TXT'
+                        content = 'v=spf1 -all'
+                    }
+                    [PSCustomObject]@{
+                        id      = 'txt-2'
+                        name    = 'example.com'
+                        type    = 'TXT'
+                        content = 'v=spf1 include:_spf.example.com -all'
+                    }
+                )
+            }
+            Mock Invoke-ZedCloudflareRequest {
+                throw 'No write request should be made.'
+            }
+
+            {
+                Invoke-ZedCloudflareTxtRecordSync -Context $script:Context -Zone $zone -Record $record
+            } | Should -Throw '*Multiple prefix TXT record matches*'
             Should -Invoke Invoke-ZedCloudflareRequest -Exactly 0
         }
 

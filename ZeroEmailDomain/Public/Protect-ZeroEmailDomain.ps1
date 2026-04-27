@@ -80,7 +80,7 @@ function Protect-ZeroEmailDomain {
             $providerDefinition = Get-ZedDnsProvider -Name $Provider
             Confirm-ZedDnsProviderImplemented -Provider $providerDefinition
             $providerContext = Get-ZedDnsProviderContext -Provider $providerDefinition -CloudflareApiToken $CloudflareApiToken -CloudflareBaseUri $CloudflareBaseUri -CloudflarePageSize $CloudflarePageSize
-            $desiredRecords = Get-ZedDesiredEmailProtectionRecord -Ttl $Ttl
+            $desiredRecords = Get-ZedDesiredEmailProtectionRecordSet -Ttl $Ttl
         } catch {
             $PSCmdlet.ThrowTerminatingError($_)
         }

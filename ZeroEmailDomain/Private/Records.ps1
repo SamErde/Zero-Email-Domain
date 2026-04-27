@@ -1,5 +1,6 @@
-function Get-ZedDesiredEmailProtectionRecord {
+function Get-ZedDesiredEmailProtectionRecordSet {
     [CmdletBinding()]
+    [OutputType([PSCustomObject])]
     param(
         [Parameter()]
         [ValidateRange(60, 86400)]
