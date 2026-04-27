@@ -38,7 +38,7 @@ jobs:
           fetch-depth: 0
 
       - name: MegaLinter
-        uses: oxsecurity/megalinter/flavors/dotnet@7e042c726c68415475b05a65a686c612120a1232 # v7.7.0
+        uses: oxsecurity/megalinter/flavors/dotnet@8fbdead70d1409964ab3d5afa885e18ee85388bb # v9.4.0
         id: ml
         env:
           DISABLE: COPYPASTE
