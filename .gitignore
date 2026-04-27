@@ -1,0 +1,4 @@
+APIToken.txt
+*.log
+.env
+.env.*

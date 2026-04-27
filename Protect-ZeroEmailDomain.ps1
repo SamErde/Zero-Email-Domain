@@ -1,12 +1,11 @@
 <#
 .SYNOPSIS
-    Legacy compatibility wrapper for protecting domains that do not send email.
+    Applies deny-all email DNS records to domains that do not receive email.
 
 .DESCRIPTION
-    This script is being replaced by the ZeroEmailDomain PowerShell module and
-    the Protect-ZeroEmailDomain.ps1 entry point. It remains in the repository
-    root temporarily so existing automation can transition to the new command
-    name without immediately breaking.
+    Imports the ZeroEmailDomain module and calls Protect-ZeroEmailDomain.
+    The root script is intentionally thin so provider-specific API logic can
+    live in the module and be tested independently.
 
 .PARAMETER Provider
     DNS provider to use. Cloudflare is currently implemented. AzureDns,
@@ -35,14 +34,14 @@
 
 .EXAMPLE
     # Set $Token to a SecureString from your preferred secret manager.
-    .\Set DNS Records for Zero-Email Domain.ps1 -Provider Cloudflare -CloudflareApiToken $Token -WhatIf
+    .\Protect-ZeroEmailDomain.ps1 -Provider Cloudflare -CloudflareApiToken $Token -WhatIf
 
 .OUTPUTS
     PSCustomObject when PassThru is specified.
 
 .NOTES
-    Prefer Protect-ZeroEmailDomain.ps1 or the Protect-ZeroEmailDomain function
-    from the ZeroEmailDomain module for new automation.
+    This script is the preferred repository-root entry point. The reusable
+    implementation lives in the ZeroEmailDomain module.
 #>
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 param(
