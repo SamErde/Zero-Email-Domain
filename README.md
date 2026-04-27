@@ -51,23 +51,23 @@ Limit processing to specific zones:
 
 For zones without MX records, the command creates or updates these TXT records:
 
-| Purpose | Name | Content |
-| --- | --- | --- |
-| SPF | `@` | `v=spf1 -all` |
-| DKIM | `*._domainkey` | `v=DKIM1; p=` |
-| DMARC | `_dmarc` | `v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s` |
+| Purpose | Name           | Content                                                |
+| ------- | -------------- | ------------------------------------------------------ |
+| SPF     | `@`            | `v=spf1 -all`                                         |
+| DKIM    | `*._domainkey` | `v=DKIM1; p=`                                         |
+| DMARC   | `_dmarc`       | `v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s`      |
 
 The command skips zones that already have MX records.
 
 ## Provider support
 
-| Provider | Status | Notes |
-| --- | --- | --- |
-| Cloudflare | Implemented | Uses the Cloudflare v4 REST API with tested paging. |
-| Azure DNS | Planned | Extension point registered for a future `Az.Dns` provider. |
-| AWS Route 53 | Planned | Extension point registered for a future `AWS.Tools.Route53` provider. |
-| GoDaddy | Planned | Extension point registered for the GoDaddy Domains API. |
-| Namecheap | Planned | Extension point registered for the Namecheap XML API. |
+| Provider     | Status      | Notes                                                               |
+| ------------ | ----------- | ------------------------------------------------------------------- |
+| Cloudflare   | Implemented | Uses the Cloudflare v4 REST API with tested paging.                 |
+| Azure DNS    | Planned     | Extension point registered for a future `Az.Dns` provider.          |
+| AWS Route 53 | Planned     | Extension point registered for a future `AWS.Tools.Route53` provider. |
+| GoDaddy      | Planned     | Extension point registered for the GoDaddy Domains API.             |
+| Namecheap    | Planned     | Extension point registered for the Namecheap XML API.               |
 
 Unsupported providers fail closed with a clear error instead of silently doing
 nothing.

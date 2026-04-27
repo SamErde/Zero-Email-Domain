@@ -12,9 +12,11 @@ name: PowerShell
 
 "on":
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
   schedule:
     - cron: '39 17 * * 2'
   workflow_dispatch:
