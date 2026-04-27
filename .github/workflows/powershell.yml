@@ -62,7 +62,7 @@ jobs:
 
       - name: Validate module manifest
         shell: pwsh
-        run: Test-ModuleManifest -Path ./ZeroEmailDomain/ZeroEmailDomain.psd1 | Out-Null
+        run: Test-ModuleManifest -Path ./ParkRanger/ParkRanger.psd1 | Out-Null
 
       - name: Run Pester tests
         shell: pwsh

@@ -1,17 +1,20 @@
-# Zero Email Domain
+# ParkRanger
 
-Automatically create "reject all" SPF, DKIM, and DMARC DNS records in domains
-that contain no MX records.
+ParkRanger automatically creates "reject all" SPF, DKIM, and DMARC DNS records
+in domains that contain no MX records.
 
-This project is being transitioned from the original Cloudflare-only script to a
-PowerShell module plus thin command scripts. The current implementation supports
-Cloudflare and is designed so other DNS providers can be added behind the same
-orchestration logic.
+The project is a PowerShell module plus thin command scripts. The current
+implementation supports Cloudflare and is designed so other DNS providers can be
+added behind the same orchestration logic.
 
-The original `Set DNS Records for Zero-Email Domain.ps1` file remains in the
-repository root as a temporary compatibility wrapper. New automation should use
-`Protect-ZeroEmailDomain.ps1` or import the `ZeroEmailDomain` module and call
-`Protect-ZeroEmailDomain`.
+The ParkRanger name is intentionally broader than parked domains. The current
+command focuses on universal email protections for domains that do not exchange
+mail, including domains that still host apps or web sites. Future commands can
+extend the same stewardship model to other domain-protection checks.
+
+The `Set DNS Records for ParkRanger.ps1` file remains in the repository root as
+a readable wrapper. New automation should use `Set-ParkRangerProtection.ps1` or
+import the `ParkRanger` module and call `Set-ParkRangerProtection`.
 
 ## Requirements
 
@@ -26,21 +29,21 @@ Preview the changes before writing records:
 
 ```powershell
 # Set $Token to a SecureString from your preferred secret manager.
-.\Protect-ZeroEmailDomain.ps1 -Provider Cloudflare -CloudflareApiToken $Token -WhatIf
+.\Set-ParkRangerProtection.ps1 -Provider Cloudflare -CloudflareApiToken $Token -WhatIf
 ```
 
 Apply records and return structured results:
 
 ```powershell
 # Set $Token to a SecureString from your preferred secret manager.
-.\Protect-ZeroEmailDomain.ps1 -Provider Cloudflare -CloudflareApiToken $Token -PassThru
+.\Set-ParkRangerProtection.ps1 -Provider Cloudflare -CloudflareApiToken $Token -PassThru
 ```
 
 Limit processing to specific zones:
 
 ```powershell
 # Set $Token to a SecureString from your preferred secret manager.
-.\Protect-ZeroEmailDomain.ps1 `
+.\Set-ParkRangerProtection.ps1 `
     -Provider Cloudflare `
     -CloudflareApiToken $Token `
     -ZoneName 'example.com', 'example.net' `
@@ -90,6 +93,12 @@ Invoke-Pester -Path .\Tests
 
 ## To Do
 
+- [ ] Add domain status detection for dormant, non-sending, active, and mixed
+      zones.
+- [ ] Add null MX support for domains that do not receive mail.
+- [ ] Add CAA policy support for dormant-domain lockdown and app-domain CA
+      restriction.
+- [ ] Add subdomain takeover and stale DNS record audits.
 - [ ] Implement Azure DNS provider.
 - [ ] Implement AWS Route 53 provider.
 - [ ] Implement GoDaddy provider.
