@@ -1,5 +1,7 @@
 # ParkRanger
 
+** Formerly known as "Zero Email Domain."
+
 ParkRanger automatically creates "reject all" SPF, DKIM, and DMARC DNS records
 in domains that contain no MX records.
 
