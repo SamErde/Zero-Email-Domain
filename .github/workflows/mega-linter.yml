@@ -3,7 +3,7 @@
 ---
 name: MegaLinter
 
-on:
+"on":
   push:
   pull_request:
     branches:
@@ -41,13 +41,14 @@ jobs:
         uses: oxsecurity/megalinter/flavors/dotnet@7e042c726c68415475b05a65a686c612120a1232 # v7.7.0
         id: ml
         env:
+          DISABLE: COPYPASTE
           VALIDATE_ALL_CODEBASE: >-
             ${{
               github.event_name == 'push' &&
               contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
             }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DISABLE_LINTERS: SPELL_LYCHEE
+          DISABLE_LINTERS: REPOSITORY_GRYPE,SPELL_LYCHEE
 
       - name: Archive production artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

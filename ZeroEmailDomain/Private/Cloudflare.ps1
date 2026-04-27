@@ -23,6 +23,7 @@ function Get-ZedCloudflareContext {
 
 function Join-ZedQueryString {
     [CmdletBinding()]
+    [OutputType([string])]
     param(
         [Parameter()]
         [hashtable]$Query
@@ -49,6 +50,7 @@ function Join-ZedQueryString {
 
 function Get-ZedCloudflareErrorMessage {
     [CmdletBinding()]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory)]
         [object]$Response
@@ -255,6 +257,7 @@ function Test-ZedCloudflareZoneHasMxRecord {
 
 function ConvertTo-ZedCloudflareRecordName {
     [CmdletBinding()]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
@@ -288,8 +291,11 @@ function Find-ZedDnsTxtRecord {
     )
 
     $records = @($Record)
+    $desiredContent = $DesiredRecord.Content
+    $desiredMatchPrefix = $DesiredRecord.MatchPrefix
+
     $exactMatch = $records |
-        Where-Object { $_.content -eq $DesiredRecord.Content } |
+        Where-Object { $_.content -eq $desiredContent } |
         Select-Object -First 1
 
     if ($exactMatch) {
@@ -300,7 +306,7 @@ function Find-ZedDnsTxtRecord {
     }
 
     $prefixMatch = $records |
-        Where-Object { $_.content -like "$($DesiredRecord.MatchPrefix)*" } |
+        Where-Object { $_.content -like "$desiredMatchPrefix*" } |
         Select-Object -First 1
 
     if ($prefixMatch) {

@@ -1,5 +1,6 @@
 function Get-ZedDnsProvider {
     [CmdletBinding()]
+    [OutputType([object[]])]
     param(
         [Parameter()]
         [ValidateSet('Cloudflare', 'AzureDns', 'Route53', 'GoDaddy', 'Namecheap')]
