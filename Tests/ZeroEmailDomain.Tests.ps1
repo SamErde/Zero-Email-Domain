@@ -62,6 +62,15 @@ Describe 'Cloudflare API helpers' {
             $queryString | Should -Be '?name=example.com&type=TXT'
         }
 
+        It 'returns an empty query string when all values are empty' {
+            $queryString = Join-ZedQueryString -Query @{
+                name = ''
+                type = $null
+            }
+
+            $queryString | Should -Be ''
+        }
+
         It 'returns every Cloudflare page' {
             Mock Invoke-RestMethod {
                 if ($Uri -match 'page=1') {

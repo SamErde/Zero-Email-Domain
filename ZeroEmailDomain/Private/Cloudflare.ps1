@@ -33,13 +33,13 @@ function Join-ZedQueryString {
         return ''
     }
 
-    $pairs = foreach ($key in ($Query.Keys | Sort-Object)) {
+    $pairs = @(foreach ($key in ($Query.Keys | Sort-Object)) {
         if ($null -eq $Query[$key] -or $Query[$key] -eq '') {
             continue
         }
 
         '{0}={1}' -f [Uri]::EscapeDataString([string]$key), [Uri]::EscapeDataString([string]$Query[$key])
-    }
+    })
 
     if ($pairs.Count -eq 0) {
         return ''
